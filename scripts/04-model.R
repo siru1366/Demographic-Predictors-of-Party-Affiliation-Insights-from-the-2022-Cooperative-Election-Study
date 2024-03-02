@@ -13,25 +13,38 @@ library(tidyverse)
 library(rstanarm)
 
 #### Read data ####
-analysis_data <- read_csv("data/analysis_data/analysis_data.csv")
+set.seed(853)
+cces2022 <-
+  read_csv(
+    "data/analysis_data/cces2022_clean.csv")
+cces2022$voted_for <- factor(cces2022$voted_for)
+cces2022$gender <- factor(cces2022$gender)
+cces2022$education <- factor(cces2022$education)
+cces2022$race <- factor(cces2022$race)
 
-### Model data ####
-first_model <-
+cces2022_reduced <- 
+  cces2022 |> 
+  slice_sample(n = 1000)
+
+political_preferences <-
   stan_glm(
-    formula = flying_time ~ length + width,
-    data = analysis_data,
-    family = gaussian(),
+    voted_for ~ gender + education + race,
+    data = cces2022_reduced,
+    family = binomial(link = "logit"),
     prior = normal(location = 0, scale = 2.5, autoscale = TRUE),
-    prior_intercept = normal(location = 0, scale = 2.5, autoscale = TRUE),
-    prior_aux = exponential(rate = 1, autoscale = TRUE),
+    prior_intercept = 
+      normal(location = 0, scale = 2.5, autoscale = TRUE),
     seed = 853
   )
 
-
-#### Save model ####
 saveRDS(
-  first_model,
-  file = "models/first_model.rds"
+  political_preferences,
+  file = "models/political_preferences.rds"
 )
-
+modelsummary(
+  list(
+    "Support Dem" = political_preferences
+  ),
+  statistic = "mad"
+)
 

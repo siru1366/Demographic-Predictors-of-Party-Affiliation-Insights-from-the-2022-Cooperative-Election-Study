@@ -11,34 +11,74 @@
 library(tidyverse)
 
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
 
-cleaned_data <-
-  raw_data |>
-  janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
-  mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
-  ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
 
-#### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+cces2022 <-
+  read_csv(
+    "data/raw_data/ces2022_raw.csv",col_types =
+      cols(
+        "votereg" = col_integer(),
+        "TS_p2022_party" = col_integer(),
+        "gender4" = col_integer(),
+        "educ" = col_integer(),
+        "race" = col_integer()
+      )
+  )
+
+
+cces2022<-
+  cces2022 |>
+  filter(votereg == 1,
+         TS_p2022_party %in% c(1, 6),
+         gender4 %in% c(1, 2),
+         )|>
+  mutate(
+    voted_for = if_else(TS_p2022_party == 1, "Dem", "Rep"),
+    voted_for = as_factor(voted_for),
+    gender = if_else(gender4 == 1, "Male", "Female"),
+    education = case_when(
+      educ == 1 ~ "No HS",
+      educ == 2 ~ "High school graduate",
+      educ == 3 ~ "Some college",
+      educ == 4 ~ "2-year",
+      educ == 5 ~ "4-year",
+      educ == 6 ~ "Post-grad"
+    ),
+    education = factor(
+      education,
+      levels = c(
+        "No HS",
+        "High school graduate",
+        "Some college",
+        "2-year",
+        "4-year",
+        "Post-grad"
+      )
+    ),
+    race = case_when(
+      race == 1 ~ "White",
+      race == 2 ~ "Black",
+      race == 3 ~ "Hispanic",
+      race == 4 ~ "Asian",
+      race == 5 ~ "Native American",
+      race == 6 ~ "Middle Eastern",
+      race == 7 ~ "Two or more races",
+      race == 8 ~ "Other"
+    ),
+    race = factor(
+      race,
+      levels = c(
+        "White",
+        "Black",
+        "Hispanic",
+        "Asian",
+        "Native American",
+        "Middle Eastern",
+        "Two or more races",
+        "Other"
+      )
+    )
+  ) |>
+  select(voted_for, gender, education,race)
+
+write_csv(cces2022, "data/analysis_data/cces2022_clean.csv")

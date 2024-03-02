@@ -9,18 +9,28 @@
 
 
 #### Workspace setup ####
-library(opendatatoronto)
+library(readr)
+library(dataverse)
 library(tidyverse)
 # [...UPDATE THIS...]
 
 #### Download data ####
 # [...ADD CODE HERE TO DOWNLOAD...]
 
+ces2022<- dataverse::get_dataframe_by_name(
+  filename = "CCES22_Common_OUTPUT_vv_topost.csv",
+  dataset = "10.7910/DVN/PR4L8P",
+  server = "dataverse.harvard.edu",
+  .f = read_csv
+) 
+
+  ces2022_raw <-ces2022|>select(votereg, TS_p2022_party, gender4, educ, race)
+  write_csv(ces2022_raw, "data/raw_data/ces2022_raw.csv")
 
 
 #### Save data ####
 # [...UPDATE THIS...]
 # change the_raw_data to whatever name you assigned when you downloaded it.
-write_csv(the_raw_data, "inputs/data/raw_data.csv") 
+
 
          
