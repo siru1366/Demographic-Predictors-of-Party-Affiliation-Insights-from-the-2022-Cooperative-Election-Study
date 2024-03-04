@@ -17,9 +17,11 @@ bibliography: references.bib
 #| include: false
 #| warning: false
 #| message: false
-
+library(bayesplot)
+library(brms)
 library(tidyverse)
 library(palmerpenguins)
+library(rstanarm)
 ```
 
 
@@ -32,6 +34,21 @@ The remainder of this paper is structured as follows. @sec-data....
 
 
 # Data {#sec-data}
+## Data Source
+The dataset utilized is derived from the 2022 Cooperative Election Study, comprising a nationally representative sample of 60,000 American adults.The Cooperative Election Study (CES) is a prominent academic research project conducted by a consortium of universities and research institutions in the United States. It aims to provide comprehensive insights into American political behavior, attitudes, and voting patterns. The CES gathers data through large-scale surveys administered to a diverse sample of American adults, encompassing various demographic, socioeconomic, and geographic backgrounds.
+
+## Data Measurment
+The data collection process for CES 2022 involved a systematic sampling approach utilizing questionnaire surveys. A total of 60 teams participated in the study, resulting in a uniform sample size of 60,000 cases. Recruitment of study participants took place in the autumn of 2022.
+
+Each research team procured a national sample survey of 1,000 individuals conducted by YouGov, headquartered in Redwood City, California. The survey interviews for the 2022 cycle occurred in two phases. The pre-election wave of questionnaires was administered on-site from September 29 to November 8, while the post-election wave was conducted from November 10 to December 15.
+
+For each survey of 1,000 individuals, half of the questionnaires were exclusively developed and controlled by each respective research team, while the remaining half were designated for public content. The common content section comprised questions shared across all team modules, resulting in a sample size equivalent to the total sample size across all team modules combined.
+
+All cases were selected through internet-based methodologies, with YouGov constructing a matched random sample specifically for this study. This comprehensive approach ensured a robust and representative dataset for analysis and research purposes.
+
+## Variables of Interest
+
+
 
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
@@ -115,8 +132,8 @@ Our results are summarized in @tbl-modelresults.
 
 library(rstanarm)
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
+ political_preferences <-
+  readRDS(file = here::here("models/political_preferences.rds"))
 ```
 
 ```{r}
@@ -128,11 +145,11 @@ first_model <-
 
 modelsummary::modelsummary(
   list(
-    "First model" = first_model
+    "Support Dem" = political_preferences
   ),
-  statistic = "mad",
-  fmt = 2
+  statistic = "mad"
 )
+
 ```
 
 
@@ -179,37 +196,20 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 #| fig-cap: "Examining how the model fits, and is affected by, the data"
 #| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
+library(bayesplot)
+library(ggplot2)
 
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
+mcmc_intervals(political_preferences, prob = 0.9) +
+  labs(x = "90 per cent credibility interval")
+
 ```
 
 ## Diagnostics
 
 @fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
 
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
 
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
 
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
 
 
 
