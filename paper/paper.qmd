@@ -27,6 +27,8 @@ library(rstanarm)
 
 # Introduction
 
+The 2024 United States presidential election, set for Tuesday, November 5, 2024, marks the 60th quadrennial presidential election (@election). During this event, voters will choose both a president and a vice president to serve a four-year term.
+
 You can and should cross-reference sections and sub-sections. We use @citeR and @rohan.
 
 The remainder of this paper is structured as follows. @sec-data....
@@ -77,14 +79,7 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 #| warning: false
 #| message: false
 
-analysis_data <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
 
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
 ```
 
 Talk way more about it. 
@@ -93,31 +88,57 @@ Talk way more about it.
 
 # Model
 
-The goal of our modelling strategy is twofold. Firstly,...
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+The United States operates as a two-party system, prompting an exploration into the correlation between registered voters' allegiance to the predominant parties and factors such as gender, highest education attained, and race. Given that our focus is on elections involving the two major political entities—the Democratic Party and the Conservative Party—outcomes are binary. Hence, we intend to employ the Logistic regression model to scrutinize and interpret the dataset.
+Background details and diagnostics are included in [Appendix -@sec-model-details].
 
 ## Model set-up
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+The model that we are interested in is:
 
 \begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
+y_i|\pi_i &\sim \mbox{Bern}(\pi_i) \\
+\mbox{logit}(\pi_i) &= \alpha + \beta_1 \times \mbox{gender}_i + \beta_2 \times \mbox{education}_i + \beta_3 \times \mbox{race}_i\\
 \alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
+\beta_1 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_2 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_3 &\sim \mbox{Normal}(0, 2.5)
 \end{align}
+
+The logistic regression model specified for analyzing support for the Democratic Party among registered voters in the United States is defined as follows:
+
+1. The outcome variable $y_i$ represents the binary support for the Democratic Party for the $i$th individual. It follows a Bernoulli distribution with parameter $\pi_i$, representing the probability of supporting the Democratic Party.
+
+2. The logit transformation of the probability $\pi_i$ is modeled as a linear combination of predictor variables. The predictors include gender ($\text{gender}_i$), education level ($\text{education}_i$), and race ($\text{race}_i$). The coefficients associated with these predictors are denoted as $\beta_1$, $\beta_2$, and $\beta_3$, respectively.
+
+3. The intercept term ($\alpha$) captures the baseline support for the Democratic Party when all predictor variables are set to zero.
+
+4. Prior distributions are specified for the intercept ($\alpha$) and the coefficients ($\beta_1$, $\beta_2$, $\beta_3$). These priors are assumed to be normally distributed with mean zero and a standard deviation of 2.5. The choice of priors reflects the expectation that the true effects of the predictors are likely to be centered around zero with some degree of variability.
+
+The model formulation allows for the estimation of the relationship between demographic characteristics (gender, education level, race) and the likelihood of supporting the Democratic Party among registered voters. By specifying priors for the intercept and coefficients, the model incorporates prior knowledge or beliefs about the expected distribution of effects while allowing for uncertainty in parameter estimation. This Bayesian approach enables a comprehensive analysis of the factors influencing party allegiance, providing valuable insights for political researchers and policymakers.
+  
+
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
 
 ### Model justification
+The chosen logistic regression model serves as a suitable framework for examining the association between registered voters' party allegiance and demographic characteristics such as gender, highest education attained, and race within the context of the United States' two-party system.
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+1. **Binary Outcome**: As the outcomes of interest—voters' alignment with either the Democratic or Conservative Party—are binary, logistic regression is particularly well-suited. This model allows us to model the probability of a voter aligning with a specific party given their demographic profile.
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+2. **Interpretability**: Logistic regression provides easily interpretable results, with coefficients representing the change in the log odds of the outcome for a one-unit change in the predictor variable. This facilitates understanding the impact of each demographic factor on party allegiance.
+
+3. **Flexibility**: The model accommodates both categorical (e.g., gender, race) and continuous (e.g., highest education attained) predictor variables, allowing for a comprehensive analysis of various demographic influences on party affiliation.
+
+4. **Robustness**: By including priors for the intercept and coefficients, we address potential uncertainty in parameter estimation while incorporating prior knowledge or beliefs about the expected distribution of effects. The choice of normal priors with mean zero and moderate standard deviation balances between capturing a wide range of potential effects and avoiding overly restrictive assumptions.
+
+5. **Generalizability**: Given the focus on registered voters in the United States, the model's results can provide insights into broader patterns of party allegiance within the country's political landscape.
+
+6. **Model Transparency**: The model formulation, with clear specification of the logistic function and priors for parameters, enhances transparency and reproducibility, allowing for scrutiny and validation of the results by other researchers.
+
+Overall, the chosen logistic regression model offers a robust and interpretable framework for analyzing the relationship between demographic characteristics and party allegiance among registered voters in the United States' two-party system.
+
 
 
 # Results
@@ -153,6 +174,44 @@ modelsummary::modelsummary(
 ```
 
 
+In the logistic regression analysis based on 5000 observations, specific coefficients provide detailed insights into the factors influencing support for the Democratic Party among registered voters in the United States. Let's delve into the findings with more precision:
+
+1. **Gender Dynamics:**
+   - Non-binary individuals exhibit a substantial decrease in support for the Democratic Party, with a coefficient of -3.086 (standard error: 0.782). This suggests that non-binary individuals are significantly less likely to support the Democratic Party compared to women, the reference category.
+   - Similarly, individuals identifying as "other" also demonstrate a significant decrease in support, with a coefficient of -2.317 (standard error: 1.218). This indicates a considerable deviation from the baseline support observed among women.
+   - In contrast, women, the reference category, exhibit a relatively minor decrease in support, with a coefficient of -0.524 (standard error: 0.062). While statistically significant, this decrease is less pronounced compared to non-binary and other gender identities.
+
+2. **Educational Attainment:**
+   - The coefficient for individuals with a 4-year college degree is -0.516 (standard error: 0.112), indicating a decrease in support for the Democratic Party compared to individuals with lower educational attainment.
+   - Conversely, individuals with only a high school education or no high school diploma show slight increases in support, with coefficients of 0.248 (standard error: 0.118) and 0.252 (standard error: 0.283), respectively. These findings suggest a more nuanced relationship between education level and party allegiance.
+   - Post-graduate education demonstrates the most substantial decrease in support, with a coefficient of -0.745 (standard error: 0.123). This suggests that individuals with advanced degrees are significantly less likely to support the Democratic Party compared to other educational groups.
+
+3. **Race and Ethnicity Considerations:**
+   - Black voters exhibit a significant decrease in support for the Democratic Party compared to White voters, with a coefficient of -2.368 (standard error: 0.370). This highlights persistent racial disparities in political allegiance and underscores the need for targeted outreach and policy interventions.
+   - Native American and Two or more races demonstrate increases in support, with coefficients of 0.882 (standard error: 0.492) and 1.178 (standard error: 0.399), respectively. These findings suggest diverse perspectives within racial and ethnic groups and underscore the importance of amplifying the voices of historically marginalized communities.
+
+4. **Model Evaluation and Implications:**
+   - The logistic regression model exhibits reasonable predictive performance, with an R-squared value of 0.144 and a Root Mean Square Error (RMSE) of 0.46. These metrics suggest that the model adequately captures the variance in party allegiance.
+   - Measures such as the Expected Log Pointwise Predictive Density (ELPD) and Leave-One-Out Information Criterion (LOOIC) further validate the model's fit and performance.
+   - These findings provide valuable insights for political strategists, policymakers, and advocacy groups, informing efforts to engage diverse voter populations and promote inclusive and representative democracy.
+
+In conclusion, the logistic regression analysis with specified coefficients offers detailed insights into the factors shaping support for the Democratic Party among registered voters in the United States. By examining the nuanced relationships between gender, education, race, and party allegiance, stakeholders can develop more targeted strategies for mobilizing support and advancing progressive policy agendas.
+
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: fig-modelresultsfig
+#| fig-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+library(bayesplot)
+library(ggplot2)
+
+mcmc_intervals(political_preferences, prob = 0.9) +
+  labs(x = "90 per cent credibility interval")
+```
 
 
 # Discussion
@@ -162,12 +221,20 @@ modelsummary::modelsummary(
 If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
 
 ## Second discussion point
+Expanding on the analysis, the inclusion of non-binary and other gender identities in the questionnaire signifies a progressive step towards recognizing and acknowledging the diverse spectrum of gender identities within the population. Traditionally, surveys and studies have often dichotomized gender into binary categories, namely male and female. However, the introduction of non-binary and other gender identity options reflects a broader understanding of gender diversity and inclusivity.
 
+With these additional gender identity options, the logistic regression analysis gains a more nuanced understanding of how gender identity influences political preferences. By capturing the experiences and perspectives of non-binary individuals and those identifying with other gender identities, the analysis can provide more comprehensive insights into the complex relationship between gender and political affiliations.
+
+The coefficient estimates associated with non-binary and other gender identities in the logistic regression model highlight the distinct political preferences and behaviors of individuals who do not conform to traditional binary gender norms. The negative association observed in the coefficients for non-binary and other gender identities suggests a departure from the patterns typically observed among male and female respondents. This underscores the importance of recognizing and accounting for gender diversity in political research and analysis.
+
+Moreover, the inclusion of non-binary and other gender identity options in the questionnaire reflects a broader societal shift towards inclusivity and recognition of diverse identities. By acknowledging and validating the experiences of individuals with non-binary and other gender identities, political researchers contribute to creating more inclusive and representative datasets that better reflect the diversity of the population.
+
+Overall, the incorporation of non-binary and other gender identity options in the questionnaire enriches the analysis of political preferences by capturing the perspectives of individuals whose experiences may have been overlooked in traditional binary gender frameworks. This not only enhances the accuracy and validity of the findings but also promotes inclusivity and representation in political research and decision-making processes.
 ## Third discussion point
 
 ## Weaknesses and next steps
 
-Weaknesses and next steps should also be included.
+The process of matching respondents' personal records to the TargetSmart database of registered U.S. voters, conducted in August 2023, reveals several notable weaknesses. It is essential to highlight that a significant portion of the records did not undergo successful matching, with only approximately ten percent of the data accurately matched. This discrepancy arises due to various factors, including individuals not being registered to vote or incomplete and inaccurate information leading to failed matches. Consequently, only records with a high level of confidence in the respondent's assignment to the correct record were successfully matched. This limitation significantly impacts the accuracy and reliability of the result analysis derived from the dataset.
 
 \newpage
 

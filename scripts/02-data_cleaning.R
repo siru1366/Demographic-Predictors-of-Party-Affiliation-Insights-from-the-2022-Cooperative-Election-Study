@@ -9,6 +9,8 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(dplyr)
+
 
 #### Clean data ####
 
@@ -29,13 +31,27 @@ cces2022 <-
 cces2022<-
   cces2022 |>
   filter(votereg == 1,
-         TS_p2022_party %in% c(1, 6),
-         gender4 %in% c(1, 2),
+         TS_p2022_party %in% c(1, 6)
          )|>
   mutate(
     voted_for = if_else(TS_p2022_party == 1, "Dem", "Rep"),
     voted_for = as_factor(voted_for),
     gender = if_else(gender4 == 1, "Male", "Female"),
+    gender = case_when(
+      gender4 == 1 ~ "Man",
+      gender4 == 2 ~ "Woman",
+      gender4 == 3 ~ "Non-binary",
+      gender4 == 4 ~ "Other"
+    ),
+    gender = factor(
+      gender,
+      levels = c(
+        "Man",
+        "Woman",
+        "Non-binary",
+        "Other"
+      )
+    ),
     education = case_when(
       educ == 1 ~ "No HS",
       educ == 2 ~ "High school graduate",

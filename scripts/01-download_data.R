@@ -24,13 +24,9 @@ ces2022<- dataverse::get_dataframe_by_name(
   .f = read_csv
 ) 
 
-  ces2022_raw <-ces2022|>select(votereg, TS_p2022_party, gender4, educ, race)
+  ces2022_raw <-ces2022|>select(votereg,TS_p2022_party,gender4,educ,race)
   write_csv(ces2022_raw, "data/raw_data/ces2022_raw.csv")
 
-
-#### Save data ####
-# [...UPDATE THIS...]
-# change the_raw_data to whatever name you assigned when you downloaded it.
 
 
          

@@ -9,6 +9,7 @@
 
 
 #### Workspace setup ####
+install.packages("bayesplot")
 library(tidyverse)
 library(rstanarm)
 
@@ -24,7 +25,7 @@ cces2022$race <- factor(cces2022$race)
 
 cces2022_reduced <- 
   cces2022 |> 
-  slice_sample(n = 1000)
+  slice_sample(n = 5000)
 
 political_preferences <-
   stan_glm(
@@ -41,10 +42,19 @@ saveRDS(
   political_preferences,
   file = "models/political_preferences.rds"
 )
-modelsummary(
-  list(
-    "Support Dem" = political_preferences
-  ),
-  statistic = "mad"
-)
+
+# Load the bayesplot library
+library(bayesplot)
+
+# Assuming `political_preferences` is the name of your fitted logistic regression model object
+
+# Compute the 90% Bayesian interval estimates
+cred_intervals <- posterior_interval(political_preferences, prob = 0.90)
+
+# Print the credibility intervals
+print(cred_intervals)
+
+
+
+
 
