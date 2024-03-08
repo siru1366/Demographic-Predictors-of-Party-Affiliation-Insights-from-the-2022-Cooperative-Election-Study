@@ -9,7 +9,6 @@
 
 
 #### Workspace setup ####
-install.packages("bayesplot")
 library(tidyverse)
 library(rstanarm)
 
@@ -43,16 +42,6 @@ saveRDS(
   file = "models/political_preferences.rds"
 )
 
-# Load the bayesplot library
-library(bayesplot)
-
-# Assuming `political_preferences` is the name of your fitted logistic regression model object
-
-# Compute the 90% Bayesian interval estimates
-cred_intervals <- posterior_interval(political_preferences, prob = 0.90)
-
-# Print the credibility intervals
-print(cred_intervals)
 
 
 
