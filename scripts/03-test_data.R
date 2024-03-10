@@ -11,10 +11,11 @@
 #### Workspace setup ####
 library(tidyverse)
 library(testthat)
+library(arrow)
 
 #### Test data ####
 cces2022 <-
-  read_csv(file = here::here("data/analysis_data/cces2022_clean.csv"))
+  read_parquet(file = here::here("data/analysis_data/cces2022_clean.parquet"))
 
 test_that("Number of observations is correct", {
   expect_true(nrow(cces2022) > 0)

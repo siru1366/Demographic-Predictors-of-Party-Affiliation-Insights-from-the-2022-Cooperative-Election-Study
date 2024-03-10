@@ -11,25 +11,26 @@
 #### Workspace setup ####
 library(tidyverse)
 library(rstanarm)
+library(arrow)
 
 #### Read data ####
 set.seed(853)
-cces2022 <-
-  read_csv(
-    "data/analysis_data/cces2022_clean.csv")
-cces2022$voted_for <- factor(cces2022$voted_for)
-cces2022$gender <- factor(cces2022$gender)
-cces2022$education <- factor(cces2022$education)
-cces2022$race <- factor(cces2022$race)
+analysis_data <-
+  read_parquet(
+    "data/analysis_data/cces2022_clean.parquet")
+analysis_data$voted_for <- factor(analysis_data$voted_for)
+analysis_data$gender <- factor(analysis_data$gender)
+analysis_data$education <- factor(analysis_data$education)
+analysis_data$race <- factor(analysis_data$race)
 
-cces2022_reduced <- 
+analysis_data <- 
   cces2022 |> 
   slice_sample(n = 5000)
 
 political_preferences <-
   stan_glm(
     voted_for ~ gender + education + race,
-    data = cces2022_reduced,
+    data = analysis_data,
     family = binomial(link = "logit"),
     prior = normal(location = 0, scale = 2.5, autoscale = TRUE),
     prior_intercept = 

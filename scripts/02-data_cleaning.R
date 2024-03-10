@@ -8,6 +8,7 @@
 # Any other information needed? [...UPDATE THIS...]
 
 #### Workspace setup ####
+library(arrow)
 library(tidyverse)
 library(dplyr)
 
@@ -97,4 +98,5 @@ cces2022<-
   ) |>
   select(voted_for, gender, education,race)
 
-write_csv(cces2022, "data/analysis_data/cces2022_clean.csv")
+#### Save data ####
+write_parquet(cces2022, "data/analysis_data/cces2022_clean.parquet")
