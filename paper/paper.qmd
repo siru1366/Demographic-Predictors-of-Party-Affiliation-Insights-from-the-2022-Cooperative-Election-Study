@@ -21,6 +21,8 @@ library(brms)
 library(tidyverse)
 library(palmerpenguins)
 library(rstanarm)
+library(arrow)
+library(knitr)
 ```
 
 
@@ -29,7 +31,7 @@ library(rstanarm)
 The 2024 United States presidential election, set for Tuesday, November 5, 2024, marks the 60th quadrennial presidential election (@essex-virginia). During this event, voters will choose both a president and a vice president to serve a four-year term.This election holds significant importance as it shapes the direction and leadership of the country for the subsequent four years, influencing various domestic and international policies, agendas, and priorities. By examining the relationship between demographic characteristics and party support, we aim to shed light on the complex dynamics of American electoral politics.
 
 
-The extensive election data collected from every U.S. citizen is not readily accessible for direct analysis. Hence, our goal is to estimate broader trends and patterns by conducting a sample survey.The 2022 Cooperative Election Study (CES) offers a rich tapestry of data, encompassing a diverse sample of 60,000 American adults and providing profound insights into the intricate landscape of American political behavior. In this study, we delve into this dataset to explore the factors influencing support for the Democratic Party among registered voters in the United States. Through the lens of logistic regression analysis, we aim to uncover the underlying dynamics of political allegiance, with a particular focus on variables such as gender, education level, and race.
+The extensive election data collected from every U.S. citizen is not readily accessible for direct analysis. Hence, our goal is to estimate broader trends and patterns by conducting a sample survey.The 2022 Cooperative Election Study (@DVN) offers a rich tapestry of data, encompassing a diverse sample of 60,000 American adults and providing profound insights into the intricate landscape of American political behavior. In this study, we delve into this dataset to explore the factors influencing support for the Democratic Party among registered voters in the United States. Through the lens of logistic regression analysis, we aim to uncover the underlying dynamics of political allegiance, with a particular focus on variables such as gender, education level, and race.
 
 Our findings reveal compelling associations between demographic factors and party allegiance. Among gender factors, we observe that women and non-binary voters exhibit a greater propensity to align with the Democratic Party. This underscores the importance of gender dynamics in shaping political preferences, highlighting potential avenues for targeted outreach and messaging strategies. Additionally, our analysis uncovers significant disparities in party allegiance among racial groups, with black people and Latinos demonstrating a stronger inclination towards the Democratic Party. This underscores the enduring influence of race on political identity and underscores the need for inclusive and representative political discourse.Furthermore, educational attainment emerges as a significant predictor of political leanings among voters. We find that individuals with higher levels of education are more likely to favor the Democratic Party, suggesting a complex relationship between educational attainment and political ideology. 
 
@@ -52,29 +54,94 @@ For each survey of 1,000 individuals, half of the questionnaires were exclusivel
 
 All cases were selected through internet-based methodologies, with YouGov constructing a matched random sample specifically for this study. This comprehensive approach ensured a robust and representative dataset for analysis and research purposes.
 
+To enhance our data analysis, we exclusively chose data from interviewees who responded as registered voters in the questionnaire.
+
+Data cleaning and analysis were conducted using the open-source statistical programming language `R`[@citeR], leveraging functionalities from the `tidyverse`[@tidyverse],  `ggplot2`[@ggplot2], `dplyr`[@dplyr], `readr`[@readr], `tibble`[@tibble],`stringr`[@stringr], `haven`[@haven],  `janitor`[@janitor], `knitr`[@knitr].
+
 ## Variables of Interest
 
 
-
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
-
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+#| label: tbl-all
+#| tbl-cap: First Ten Rows of US 2022 election data
 #| echo: false
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+cleaned_data <- read_parquet(file = here::here("data/analysis_data/cces2022_clean.parquet"))
+
+cleaned_data |>
+  select(voted_for, gender, education,race) |>
+  slice(1:10) |>
+  kable(
+    col.names = c("voted_for", "gender", "education","race"),
+    digits = 1,
+    booktabs = TRUE
+  )
 ```
+To better understand the data, a summary table was developed to provide a detailed description of each variable, explaining its relevance and how it contributes to our understanding of the topic. 
+@tbl-all, Our analysis primarily revolves around four key data variables. 'voted_for' denotes the presidential candidate preferred by the interviewee, specifying either Democratic or Republican affiliation. 'gender' denotes the gender of the interviewee, while 'education' indicates their highest attained level of education. Lastly, 'race' specifies the racial identity of the interviewee.
 
-Talk more about it.
+The original dataset originates from four questionnaire questions, each represented by numerical values. To simplify processing, we substitute these numbers with their corresponding options.
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+TS_p2022_party - Which party’s primary respondent voted in
+
+1. dem
+
+2. green
+
+3. ind
+
+4. libertarian
+
+5. other
+
+6. rep
+
+We rename it "vote_for".
+
+gender4-What is your gender? 
+
+1. Man
+
+2. Woman
+
+3. Non-binary
+
+4. Other
+
+educ-What is the highest level of education you have completed?
+
+1. No HS 
+
+2. High school graduate 
+
+3. Some college 13355
+
+4. 2-year 6443
+
+5. 4-year 13375
+
+6. Post-grad
+
+race-What racial or ethnic group best describes you? 
+
+1. White 
+
+2. Black 
+
+3. Hispanic 
+
+4. Asian 
+
+5. Native American 
+
+6. Middle Eastern 
+
+7. Two or more races 
+
+8. Other
+
+
+And also planes (@fig-planes) shows the distribution of presidential preferences, by gender, and highest education. And planes (@fig-race) shows the distribution of presidential preferences, by race, and highest education.
 
 ```{r}
 #| label: fig-planes
@@ -84,8 +151,7 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 #| message: false
 
 cces2022 <-
-  read_csv(file = here::here(
-    "data/analysis_data/cces2022_clean.csv"))
+  read_parquet(file = here::here("data/analysis_data/cces2022_clean.parquet"))
 cces2022 |>
   ggplot(aes(x = education, fill = voted_for)) +
   stat_count(position = "dodge") +
@@ -110,8 +176,7 @@ cces2022 |>
 #| message: false
 
 cce2022 <-
-  read_csv(file = here::here(
-    "data/analysis_data/cces2022_clean.csv"))
+   read_parquet(file = here::here("data/analysis_data/cces2022_clean.parquet"))
 cce2022 |>
   ggplot(aes(x = education, fill = voted_for)) +
   stat_count(position = "dodge") +
@@ -213,7 +278,7 @@ library(rstanarm)
 
 modelsummary::modelsummary(
   list(
-    "Support Republic" = political_preferences
+    "Support Dem" = political_preferences
   ),
   statistic = "mad"
 )
@@ -221,23 +286,23 @@ modelsummary::modelsummary(
 ```
 
 
-In the logistic regression analysis based on 5000 observations, specific coefficients provide detailed insights into the factors influencing support for the Republican Party among registered voters in the United States. Let's delve into the findings with more precision:
+In the logistic regression analysis based on 5000 observations, specific coefficients provide detailed insights into the factors influencing support for the Democratic Party among registered voters in the United States. Let's delve into the findings with more precision:
 
-1. **Gender Dynamics:**
-   - Non-binary individuals exhibit a substantial decrease in support for the Republican Party, with a coefficient of -3.086 (standard error: 0.782). This suggests that non-binary individuals are significantly less likely to support the Republican Party compared to women, the reference category.
-   - Similarly, individuals identifying as "other" also demonstrate a significant decrease in support, with a coefficient of -2.317 (standard error: 1.218). This indicates a considerable deviation from the baseline support observed among women.
-   - In contrast, women, the reference category, exhibit a relatively minor decrease in support, with a coefficient of -0.524 (standard error: 0.062). While statistically significant, this decrease is less pronounced compared to non-binary and other gender identities.
+**Gender Dynamics:**
+   - Non-binary individuals exhibit a substantial increase in support for the Democratic Party, with a coefficient of 3.106 (standard error: 0.821). This suggests that non-binary individuals are significantly more likely to support the Democratic Party compared to men, the reference category.
+   - Similarly, individuals identifying as "other" also demonstrate a significant increase in support, with a coefficient of 2.325 (standard error: 1.284). This indicates a considerable deviation from the baseline support observed among men.
+   - In contrast, women, the reference category, exhibit a relatively minor increase in support, with a coefficient of 0.524 (standard error: 0.060). While statistically significant, this increase is less pronounced compared to non-binary and other gender identities.
 
-2. **Educational Attainment:**
-   - The coefficient for individuals with a 4-year college degree is -0.516 (standard error: 0.112), indicating a decrease in support for the Republican Party compared to individuals with lower educational attainment.
-   - Conversely, individuals with only a high school education or no high school diploma show slight increases in support, with coefficients of 0.248 (standard error: 0.118) and 0.252 (standard error: 0.283), respectively. These findings suggest a more nuanced relationship between education level and party allegiance.
-   - Post-graduate education demonstrates the most substantial decrease in support, with a coefficient of -0.745 (standard error: 0.123). This suggests that individuals with advanced degrees are significantly less likely to support the Republican Party compared to other educational groups.
+**Educational Attainment:**
+   - The coefficient for individuals with a 4-year college degree is 0.773 (standard error: 0.262), indicating an increase in support for the Democratic Party compared to individuals with lower educational attainment.
+   - Conversely, individuals with only a high school education or no high school diploma show slight decreases in support, with coefficients of 0.004 (standard error: 0.266) and 0.248 (standard error: 0.279), respectively. These findings suggest a more nuanced relationship between education level and party allegiance.
+   - Post-graduate education demonstrates the most substantial increase in support, with a coefficient of 1.005 (standard error: 0.261). This suggests that individuals with advanced degrees are significantly more likely to support the Democratic Party compared to other educational groups.
 
-3. **Race and Ethnicity Considerations:**
-   - Black voters exhibit a significant decrease in support for the Republican Party compared to White voters, with a coefficient of -2.368 (standard error: 0.370). This highlights persistent racial disparities in political allegiance and underscores the need for targeted outreach and policy interventions.
-   - Native American and Two or more races demonstrate increases in support, with coefficients of 0.882 (standard error: 0.492) and 1.178 (standard error: 0.399), respectively. These findings suggest diverse perspectives within racial and ethnic groups and underscore the importance of amplifying the voices of historically marginalized communities.
+**Race and Ethnicity Considerations:**
+   - Black voters exhibit a significant increase in support for the Democratic Party compared to White voters, with a coefficient of 2.918 (standard error: 0.181). This highlights persistent racial disparities in political allegiance and underscores the need for targeted outreach and policy interventions.
+   - Hispanic voters also demonstrate an increase in support, with a coefficient of 0.904 (standard error: 0.162). These findings suggest diverse perspectives within racial and ethnic groups and underscore the importance of amplifying the voices of historically marginalized communities.
 
-4. **Model Evaluation and Implications:**
+**Model Evaluation and Implications:**
    - The logistic regression model exhibits reasonable predictive performance, with an R-squared value of 0.144 and a Root Mean Square Error (RMSE) of 0.46. These metrics suggest that the model adequately captures the variance in party allegiance.
    - Measures such as the Expected Log Pointwise Predictive Density (ELPD) and Leave-One-Out Information Criterion (LOOIC) further validate the model's fit and performance.
    - These findings provide valuable insights for political strategists, policymakers, and advocacy groups, informing efforts to engage diverse voter populations and promote inclusive and representative democracy.
@@ -263,7 +328,10 @@ mcmc_intervals(political_preferences, prob = 0.9) +
 
 # Discussion {#sec-discussion}
 
-## First discussion point {#sec-first-point}
+## Findings
+In analyzing the 2022 Collaborative Elections Study (CES) dataset, our findings reveal compelling patterns in the impact of gender, education level, and race on Democratic support within the U.S. two-party system. Specifically, our logistic regression models show that non-binary individuals and those who identify as “other” show significantly greater support for the Democratic Party compared with men, highlighting the role of gender diversity in shaping political preferences. importance. Additionally, our analysis highlights the role of education in political behavior, with individuals with advanced degrees showing a higher tendency to support Democrats, possibly due to their exposure to diverse perspectives and critical thinking skills. Additionally, racial dynamics emerged as an important factor, with black and Hispanic voters showing increased support for the Democratic Party compared with white voters, underscoring the continued importance of race in American politics.
+
+## Exploring Black Voting Behavior {#sec-first-point}
 The voting behavior of Black people in the United States, predominantly in favor of the Democratic Party, sparks a multifaceted discussion touching upon historical legacies, policy priorities, party representation, and broader political dynamics.
 
 One pivotal aspect of this discussion is the historical context that underpins the relationship between Black voters and the Democratic Party. The Civil Rights Movement of the 1960s, a watershed moment in American history, witnessed significant legislative victories that advanced racial equality and enfranchisement. Key Democratic leaders, including President Lyndon B. Johnson, played instrumental roles in passing landmark civil rights legislation. These legislative achievements forged a strong bond between Black voters and the Democratic Party, rooted in a shared history of advocating for civil rights and social justice.
@@ -275,7 +343,7 @@ Representation within the Democratic Party also plays a significant role in shap
 Conversely, perceptions of the Republican Party among Black voters also inform voting behavior. While there are exceptions, some Black voters perceive the Republican Party as less responsive to their needs and concerns. Racially insensitive rhetoric or policies, as well as efforts to restrict voting rights, may further alienate Black voters from the Republican Party and reinforce their allegiance to the Democratic Party.
 
 
-## Second discussion point
+## Understanding Political Preferences Through Inclusive Gender Identity Options
 Expanding on the analysis, the inclusion of non-binary and other gender identities in the questionnaire signifies a progressive step towards recognizing and acknowledging the diverse spectrum of gender identities within the population. Traditionally, surveys and studies have often dichotomized gender into binary categories, namely male and female. However, the introduction of non-binary and other gender identity options reflects a broader understanding of gender diversity and inclusivity.
 
 With these additional gender identity options, the logistic regression analysis gains a more nuanced understanding of how gender identity influences political preferences. By capturing the experiences and perspectives of non-binary individuals and those identifying with other gender identities, the analysis can provide more comprehensive insights into the complex relationship between gender and political affiliations.
@@ -285,9 +353,17 @@ The coefficient estimates associated with non-binary and other gender identities
 Moreover, the inclusion of non-binary and other gender identity options in the questionnaire reflects a broader societal shift towards inclusivity and recognition of diverse identities. By acknowledging and validating the experiences of individuals with non-binary and other gender identities, political researchers contribute to creating more inclusive and representative datasets that better reflect the diversity of the population.
 
 Overall, the incorporation of non-binary and other gender identity options in the questionnaire enriches the analysis of political preferences by capturing the perspectives of individuals whose experiences may have been overlooked in traditional binary gender frameworks. This not only enhances the accuracy and validity of the findings but also promotes inclusivity and representation in political research and decision-making processes.
-## Third discussion point
 
-## Weaknesses  next steps
+## Educated Voters and Democratic Support
+Voters with higher education levels tend to choose Democrats for several reasons. First, individuals with higher education often have greater exposure to diverse perspectives and critical thinking skills, which can lead them to prioritize issues such as social justice, equality, and environmental sustainability—values that align closely with the Democratic Party's platform (@delli1996americans).
+
+Second, higher education is associated with higher socioeconomic status, and Democrats typically advocate for policies aimed at supporting working-class families, improving access to healthcare and education, and reducing income inequality (@bartels2008unequal). Voters with higher education levels may perceive these policies as beneficial to themselves and society as a whole, influencing their decision to support the Democratic Party.
+
+Additionally, higher education is correlated with demographic factors such as age and urban residence, which are also associated with higher levels of Democratic Party support (@pewresearch2020education). Urban areas tend to have higher concentrations of college-educated individuals, and these areas often lean Democratic due to cultural diversity, progressive social attitudes, and a focus on issues like climate change and LGBTQ rights.
+
+Moreover, research suggests that individuals with higher education levels are more likely to engage in political participation, including voting and activism (@verba1995voice). Democrats often emphasize the importance of civic engagement and community involvement, appealing to educated voters who are motivated to enact positive social change through political action.
+
+## Weaknesses 
 
 The process of matching respondents' personal records to the TargetSmart database of registered U.S. voters, conducted in August 2023, reveals several notable weaknesses. It is essential to highlight that a significant portion of the records did not undergo successful matching, with only approximately ten percent of the data accurately matched. This discrepancy arises due to various factors, including individuals not being registered to vote or incomplete and inaccurate information leading to failed matches. Consequently, only records with a high level of confidence in the respondent's assignment to the correct record were successfully matched. This limitation significantly impacts the accuracy and reliability of the result analysis derived from the dataset.
 
@@ -295,9 +371,20 @@ Polls, while instrumental in gauging public sentiment, are subject to various we
 
 Moreover, social desirability bias can distort poll results, as seen in surveys on sensitive issues like racial attitudes or immigration. Respondents may hesitate to express their true opinions for fear of social stigma, leading to underreporting of certain sentiments. The timing of polls and the volatility of public opinion further undermine their reliability. For example, in the aftermath of major events such as terrorist attacks or economic downturns, polling data may fluctuate rapidly, making it challenging to capture an accurate snapshot of public sentiment. Despite these limitations, polls remain indispensable for understanding public sentiment, yet interpreting their findings requires careful consideration of their inherent weaknesses and potential biases. Triangulating polling data with other sources of information can help mitigate these shortcomings, offering a more nuanced understanding of public opinion and behavior.
 
+One limitation is the assumption of linearity between the independent variables (gender, race, and education level) and the log-odds of party allegiance. While logistic regression assumes a linear relationship, the actual relationship may be more complex and nonlinear, leading to potential model misspecification (@agresti2015foundations).Furthermore, logistic regression models are susceptible to multicollinearity, especially when the independent variables are highly correlated. In such cases, it becomes challenging to disentangle the individual effects of each predictor, and the model's estimates may become unstable (@allison1999logisti).
 
 
-## next steps
+It is worth mentioning that when there is very little data for a certain option, such as 'gender-other', the logistic regression model may produce biased results. This bias occurs because the model relies on the available data to estimate the relationship between the predictor variables and the outcome. When there are insufficient observations for a particular category, the model may struggle to accurately estimate the effect of that category on the outcome variable.
+
+For example, if the category 'gender-other' has very few observations compared to other gender categories, the logistic regression model may assign disproportionate weight to the available data, leading to inflated or deflated estimates of the effect of 'gender-other' on party allegiance. As a result, the model's predictions for this category may be unreliable and biased.
+
+Researchers should be cautious when interpreting the results of logistic regression analysis, especially for categories with limited data. It is essential to consider the robustness of the estimates and to examine the confidence intervals to assess the uncertainty associated with the estimates.
+
+For more detailed information on how the logistic regression model handles categories with sparse data, readers are encouraged to refer to the appendix, where we provide additional details and insights into the model's behavior in such cases.
+
+
+
+## Next Steps
 Indeed, delving into regional factors and conducting longitudinal comparisons of voter data from different years are essential next steps to deepen our understanding of the political landscape and tendencies of American voters. Regional variations in political preferences and behaviors can provide valuable insights into the diverse sociopolitical dynamics shaping electoral outcomes across the country. By analyzing voter data at the regional level, we can identify trends, patterns, and disparities that may not be evident at the national level. Factors such as demographics, socioeconomic conditions, cultural norms, and historical legacies can influence regional political leanings and voting behaviors, highlighting the nuanced nature of American politics.
 
 Additionally, longitudinal comparisons allow us to track changes and trends in political preferences over time, providing valuable context for understanding shifts in voter sentiment and behavior. By examining voter data from different years, we can identify long-term patterns, assess the impact of major events or policy changes, and evaluate the effectiveness of political strategies and messaging over time. 
@@ -315,11 +402,11 @@ Additionally, longitudinal comparisons allow us to track changes and trends in p
 
 ## Posterior predictive check
 
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
+In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. The results suggest that the data are essentially consistent with the model predictions, indicating that the model adequately captures the observed patterns and variability in the data.
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
+In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior.  
 
-```{r}
+```{r width = 10, height = 6}
 #| eval: true
 #| echo: false
 #| message: false
@@ -329,19 +416,53 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 #| fig-cap: "Examining how the model fits, and is affected by, the data"
 #| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-library(bayesplot)
-library(ggplot2)
+analysis_data <- arrow::read_parquet(here::here("data/analysis_data/cces2022_clean.parquet"))
 
-mcmc_intervals(political_preferences, prob = 0.9) +
-  labs(x = "90 per cent credibility interval")
+set.seed(853)
+
+analysis_data <- 
+  analysis_data |> 
+  slice_sample(n = 5000)
+
+
+pp_check(political_preferences) +
+  theme_classic() +
+  theme(legend.position = "bottom")
+
+
+
+
+custom_palette <- c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999", "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "#FFD92F", "#E5C494")
+
+
+posterior_vs_prior(political_preferences) +
+  theme_minimal() +
+  scale_color_manual(values = custom_palette) + 
+  theme(legend.position = "bottom") +
+  coord_flip()
 
 ```
 
+
 ## Diagnostics
 
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
+@fig-stanareyouokay-1 is a trace plot. 
 
 
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+#| label: fig-stanareyouokay
+#| fig-cap: "Checking the convergence of the MCMC algorithm"
+#| fig-subcap: ["Trace plot", "Rhat plot"]
+#| layout-ncol: 2
+
+plot(political_preferences, "trace")
+
+plot(political_preferences, "rhat")
+```
 
 
 
