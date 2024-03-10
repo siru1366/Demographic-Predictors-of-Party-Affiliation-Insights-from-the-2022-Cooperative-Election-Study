@@ -12,3 +12,5 @@ The repo is structured as:
 -   `scripts` contains the R scripts used to simulate, download and clean data.
 
 ## Statement on LLM usage
+Statement on LLM usage: Aspects of the code were written with the help of the autocomplete tool, Chat-GPT3.5. The entire chat history is available at inputs/llms/usage.txt.
+
