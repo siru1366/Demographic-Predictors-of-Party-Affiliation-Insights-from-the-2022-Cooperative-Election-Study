@@ -8,6 +8,7 @@ date: today
 date-format: long
 abstract: "Our study investigates the political leanings of American voters, particularly their affiliation with the Democratic and Republican parties, and its relationship with demographic factors. Analyzing data from the 2022 Cooperative Election Study, we utilized logistic regression analysis to identify key predictors of party allegiance. Specifically, our findings indicate that gender, race, and education level strongly influence political leanings, with women, black people, Latinos, and individuals with higher education levels exhibiting a greater tendency to align with the Democratic Party. Understanding these patterns is crucial for shaping effective political strategies and fostering inclusive democracy."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -273,7 +274,7 @@ library(rstanarm)
 #| echo: false
 #| eval: true
 #| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| tbl-cap: "Explanatory models Political Preferences (n = 5000)"
 #| warning: false
 
 modelsummary::modelsummary(
@@ -315,14 +316,13 @@ In conclusion, the logistic regression analysis with specified coefficients offe
 #| echo: false
 #| eval: true
 #| label: fig-modelresultsfig
-#| fig-cap: "Explanatory models of flight time based on wing width and wing length"
+#| fig-cap: "90 percent credibility interval"
 #| warning: false
 
 library(bayesplot)
 library(ggplot2)
 
-mcmc_intervals(political_preferences, prob = 0.9) +
-  labs(x = "90 per cent credibility interval")
+mcmc_intervals(political_preferences, prob = 0.9) 
 ```
 
 
@@ -371,7 +371,7 @@ Polls, while instrumental in gauging public sentiment, are subject to various we
 
 Moreover, social desirability bias can distort poll results, as seen in surveys on sensitive issues like racial attitudes or immigration. Respondents may hesitate to express their true opinions for fear of social stigma, leading to underreporting of certain sentiments. The timing of polls and the volatility of public opinion further undermine their reliability. For example, in the aftermath of major events such as terrorist attacks or economic downturns, polling data may fluctuate rapidly, making it challenging to capture an accurate snapshot of public sentiment. Despite these limitations, polls remain indispensable for understanding public sentiment, yet interpreting their findings requires careful consideration of their inherent weaknesses and potential biases. Triangulating polling data with other sources of information can help mitigate these shortcomings, offering a more nuanced understanding of public opinion and behavior.
 
-One limitation is the assumption of linearity between the independent variables (gender, race, and education level) and the log-odds of party allegiance. While logistic regression assumes a linear relationship, the actual relationship may be more complex and nonlinear, leading to potential model misspecification (@agresti2015foundations).Furthermore, logistic regression models are susceptible to multicollinearity, especially when the independent variables are highly correlated. In such cases, it becomes challenging to disentangle the individual effects of each predictor, and the model's estimates may become unstable (@allison1999logisti).
+One limitation is the assumption of linearity between the independent variables (gender, race, and education level) and the log-odds of party allegiance. While logistic regression assumes a linear relationship, the actual relationship may be more complex and nonlinear, leading to potential model misspecification (@agresti2015foundations).Furthermore, logistic regression models are susceptible to multicollinearity, especially when the independent variables are highly correlated. In such cases, it becomes challenging to disentangle the individual effects of each predictor, and the model's estimates may become unstable (@allison1999logistic).
 
 
 It is worth mentioning that when there is very little data for a certain option, such as 'gender-other', the logistic regression model may produce biased results. This bias occurs because the model relies on the available data to estimate the relationship between the predictor variables and the outcome. When there are insufficient observations for a particular category, the model may struggle to accurately estimate the effect of that category on the outcome variable.
@@ -467,7 +467,9 @@ plot(political_preferences, "rhat")
 
 
 
+
 \newpage
+
 
 
 # References
