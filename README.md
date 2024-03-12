@@ -1,4 +1,4 @@
-# us
+# Demographic Predictors of Party Affiliation: Insights from the 2022 Cooperative Election Study
 
 ## File Structure
 
