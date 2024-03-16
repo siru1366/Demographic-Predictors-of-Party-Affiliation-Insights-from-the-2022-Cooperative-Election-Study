@@ -3,7 +3,7 @@ title: "Demographic Predictors of Party Affiliation: Insights from the 2022 Coop
 subtitle: "Examining the Influence of Gender, Race, and Education Level on Political Leanings in the United States"
 author: 
   - Sirui Tan
-thanks: "Code and data are available at: https://github.com/siru1366/us.git."
+thanks: "[Code and data are available here](https://github.com/siru1366/Demographic-Predictors-of-Party-Affiliation-Insights-from-the-2022-Cooperative-Election-Study.git)"
 date: today
 date-format: long
 abstract: "Our study investigates the political leanings of American voters, particularly their affiliation with the Democratic and Republican parties, and its relationship with demographic factors. Analyzing data from the 2022 Cooperative Election Study, we utilized logistic regression analysis to identify key predictors of party allegiance. Specifically, our findings indicate that gender, race, and education level strongly influence political leanings, with women, black people, Latinos, and individuals with higher education levels exhibiting a greater tendency to align with the Democratic Party. Understanding these patterns is crucial for shaping effective political strategies and fostering inclusive democracy."
@@ -108,6 +108,7 @@ gender4-What is your gender?
 3. Non-binary
 
 4. Other
+
 The "gender4" variable serves as a means to capture the diversity of gender identities within the surveyed population by asking respondents to specify their gender. With four distinct options available, including "Man," "Woman," "Non-binary," and "Other," we rename it "gender".
 
 
@@ -117,11 +118,11 @@ educ-What is the highest level of education you have completed?
 
 2. High school graduate 
 
-3. Some college 13355
+3. Some college 
 
-4. 2-year 6443
+4. 2-year 
 
-5. 4-year 13375
+5. 4-year 
 
 6. Post-grad
 
@@ -168,7 +169,7 @@ The "race" variable prompts respondents to identify the racial or ethnic group t
 
 
 
-And also planes (@fig-planes) shows the distribution of presidential preferences, by gender, and highest education.There is a stronger propensity among women with advanced education to favor the Democratic Party. Despite the relatively small number of respondents identifying as "Non-binary" or "Other" within the gender options, we have chosen to include them in the analysis rather than discarding their data. Further discussions related to this decision can be found in the @sec-discussion-third. 
+And also planes (@fig-planes) shows the distribution of presidential preferences, by gender, and highest education.There is a stronger propensity among women with advanced education to favor the Democratic Party. Despite the relatively small number of respondents identifying as "Non-binary" or "Other" within the gender options, we have chosen to include them in the analysis rather than discarding their data. Further discussions related to this decision can be found in the @sec-discussion-fouth. 
 
 And planes (@fig-race) shows the distribution of presidential preferences, by race, and highest education.Blacks tend to lean towards the Democratic Party regardless of their educational attainment. However, the political leanings of other racial groups may vary based on their level of education.
 
@@ -340,18 +341,7 @@ In conclusion, the logistic regression analysis with specified coefficients offe
 
 
 
-```{r}
-#| echo: false
-#| eval: true
-#| label: fig-modelresultsfig
-#| fig-cap: "90 percent credibility interval"
-#| warning: false
 
-library(bayesplot)
-library(ggplot2)
-
-mcmc_intervals(political_preferences, prob = 0.9) 
-```
 
 
 # Discussion {#sec-discussion}
@@ -371,17 +361,6 @@ Representation within the Democratic Party also plays a significant role in shap
 Conversely, perceptions of the Republican Party among Black voters also inform voting behavior. While there are exceptions, some Black voters perceive the Republican Party as less responsive to their needs and concerns. Racially insensitive rhetoric or policies, as well as efforts to restrict voting rights, may further alienate Black voters from the Republican Party and reinforce their allegiance to the Democratic Party [@parker2013].
 
 
-## Understanding Political Preferences Through Inclusive Gender Identity Options {#sec-discussion-third}
-Expanding on the analysis, the inclusion of non-binary and other gender identities in the questionnaire signifies a progressive step towards recognizing and acknowledging the diverse spectrum of gender identities within the population. Traditionally, surveys and studies have often dichotomized gender into binary categories, namely male and female. However, the introduction of non-binary and other gender identity options reflects a broader understanding of gender diversity and inclusivity.
-
-With these additional gender identity options, the logistic regression analysis gains a more nuanced understanding of how gender identity influences political preferences. By capturing the experiences and perspectives of non-binary individuals and those identifying with other gender identities, the analysis can provide more comprehensive insights into the complex relationship between gender and political affiliations.
-
-The coefficient estimates associated with non-binary and other gender identities in the logistic regression model highlight the distinct political preferences and behaviors of individuals who do not conform to traditional binary gender norms. The negative association observed in the coefficients for non-binary and other gender identities suggests a departure from the patterns typically observed among male and female respondents. This underscores the importance of recognizing and accounting for gender diversity in political research and analysis.
-
-Moreover, the inclusion of non-binary and other gender identity options in the questionnaire reflects a broader societal shift towards inclusivity and recognition of diverse identities. By acknowledging and validating the experiences of individuals with non-binary and other gender identities, political researchers contribute to creating more inclusive and representative datasets that better reflect the diversity of the population.
-
-Overall, the incorporation of non-binary and other gender identity options in the questionnaire enriches the analysis of political preferences by capturing the perspectives of individuals whose experiences may have been overlooked in traditional binary gender frameworks. This not only enhances the accuracy and validity of the findings but also promotes inclusivity and representation in political research and decision-making processes.
-
 ## Educated Voters and Democratic Support
 Voters with higher education levels tend to choose Democrats for several reasons. First, individuals with higher education often have greater exposure to diverse perspectives and critical thinking skills, which can lead them to prioritize issues such as social justice, equality, and environmental sustainability—values that align closely with the Democratic Party's platform [@delli1996americans].
 
@@ -391,30 +370,22 @@ Additionally, higher education is correlated with demographic factors such as ag
 
 Moreover, research suggests that individuals with higher education levels are more likely to engage in political participation, including voting and activism [@verba1995voice]. Democrats often emphasize the importance of civic engagement and community involvement, appealing to educated voters who are motivated to enact positive social change through political action.
 
-## Weaknesses 
+## Recognizing Non-Binary Representation {#sec-discussion-fouth}
+Expanding on the analysis, including non-binary and other gender identities in the questionnaire represents progress in acknowledging gender diversity. According to a study by @bauer2018demographic, traditional surveys have often categorized gender as male or female, neglecting non-binary individuals. However, by adding "non-binary" and other options, we gain a deeper understanding of how gender influences political views.
 
-The process of matching respondents' personal records to the TargetSmart database of registered U.S. voters, conducted in August 2023, reveals several notable weaknesses. It is essential to highlight that a significant portion of the records did not undergo successful matching, with only approximately ten percent of the data accurately matched. This discrepancy arises due to various factors, including individuals not being registered to vote or incomplete and inaccurate information leading to failed matches. Consequently, only records with a high level of confidence in the respondent's assignment to the correct record were successfully matched. This limitation significantly impacts the accuracy and reliability of the result analysis derived from the dataset.
+With these additional options, logistic regression analysis can better grasp the impact of gender identity on political preferences. The coefficients associated with non-binary and other genders highlight distinct political behaviors, deviating from the usual male-female patterns @smith2019exploring.
 
-Polls, while instrumental in gauging public sentiment, are subject to various weaknesses that can compromise their accuracy. For instance, in the 2016 U.S. presidential election, many polls failed to accurately predict the outcome, particularly in key battleground states like Michigan and Wisconsin. Sampling bias played a significant role, as some polls underestimated the support for then-candidate Donald Trump due to an oversampling of college-educated voters. Nonresponse bias also contributed to inaccuracies, as certain demographic groups, such as rural voters, were less likely to participate in polls but turned out in higher numbers on Election Day.
+Moreover, this inclusive approach reflects a societal shift towards recognizing diverse identities. As noted by @jones2020understanding, validating the experiences of non-binary individuals in research contributes to more representative datasets.
 
-Moreover, social desirability bias can distort poll results, as seen in surveys on sensitive issues like racial attitudes or immigration. Respondents may hesitate to express their true opinions for fear of social stigma, leading to underreporting of certain sentiments. The timing of polls and the volatility of public opinion further undermine their reliability. For example, in the aftermath of major events such as terrorist attacks or economic downturns, polling data may fluctuate rapidly, making it challenging to capture an accurate snapshot of public sentiment. Despite these limitations, polls remain indispensable for understanding public sentiment, yet interpreting their findings requires careful consideration of their inherent weaknesses and potential biases. Triangulating polling data with other sources of information can help mitigate these shortcomings, offering a more nuanced understanding of public opinion and behavior.
+Overall, incorporating non-binary and other gender identities enriches political analysis, providing insights often overlooked in binary frameworks @johnson2018non. This promotes inclusivity and accuracy in research and decision-making.
 
-One limitation is the assumption of linearity between the independent variables (gender, race, and education level) and the log-odds of party allegiance. While logistic regression assumes a linear relationship, the actual relationship may be more complex and nonlinear, leading to potential model misspecification [@agresti2015foundations].Furthermore, logistic regression models are susceptible to multicollinearity, especially when the independent variables are highly correlated. In such cases, it becomes challenging to disentangle the individual effects of each predictor, and the model's estimates may become unstable [@allison1999logistic].
+## Weaknesses and Next Steps
 
-It is worth mentioning that when there is very little data for a certain option, such as 'gender-other', the logistic regression model may produce biased results. This bias occurs because the model relies on the available data to estimate the relationship between the predictor variables and the outcome. When there are insufficient observations for a particular category, the model may struggle to accurately estimate the effect of that category on the outcome variable.
+One limitation lies in the assumption of linearity between the independent variables (gender, race, and education level) and the log-odds of party allegiance. Although logistic regression assumes a linear relationship, the actual relationship may be more complex and nonlinear, potentially leading to model misspecification @hosmer2013applied. Logistic regression models are also susceptible to multicollinearity, especially when independent variables are highly correlated, making it challenging to discern the individual effects of each predictor, and resulting in unstable model estimates @belsley1980regression. 
 
-For example, if the category 'gender-other' has very few observations compared to other gender categories, the logistic regression model may assign disproportionate weight to the available data, leading to inflated or deflated estimates of the effect of 'gender-other' on party allegiance. As a result, the model's predictions for this category may be unreliable and biased.
+It is worth noting that when there is minimal data for a particular option, such as 'gender-other', the logistic regression model may produce biased results. This bias occurs because the model relies on the available data to estimate the relationship between predictor variables and the outcome. Insufficient observations for a category like 'gender-other' may lead the model to assign disproportionate weight to the available data, resulting in inflated or deflated estimates of the effect of 'gender-other' on party allegiance, thus rendering the predictions unreliable and biased @greenland1995critical.
 
-Researchers should be cautious when interpreting the results of logistic regression analysis, especially for categories with limited data. It is essential to consider the robustness of the estimates and to examine the confidence intervals to assess the uncertainty associated with the estimates.
-
-For more detailed information on how the logistic regression model handles categories with sparse data, readers are encouraged to refer to the appendix, where we provide additional details and insights into the model's behavior in such cases.
-
-
-
-## Next Steps
-Indeed, delving into regional factors and conducting longitudinal comparisons of voter data from different years are essential next steps to deepen our understanding of the political landscape and tendencies of American voters. Regional variations in political preferences and behaviors can provide valuable insights into the diverse sociopolitical dynamics shaping electoral outcomes across the country. By analyzing voter data at the regional level, we can identify trends, patterns, and disparities that may not be evident at the national level. Factors such as demographics, socioeconomic conditions, cultural norms, and historical legacies can influence regional political leanings and voting behaviors, highlighting the nuanced nature of American politics.
-
-Additionally, longitudinal comparisons allow us to track changes and trends in political preferences over time, providing valuable context for understanding shifts in voter sentiment and behavior. By examining voter data from different years, we can identify long-term patterns, assess the impact of major events or policy changes, and evaluate the effectiveness of political strategies and messaging over time. 
+Exploring regional factors and conducting longitudinal comparisons of voter data from different years are crucial next steps to deepen our understanding of the American political landscape and voter tendencies. Regional variations in political preferences offer insights into diverse sociopolitical dynamics shaping electoral outcomes. Analyzing voter data at the regional level helps identify trends, patterns, and disparities not evident nationally. Demographics, socioeconomic conditions, cultural norms, and historical legacies influence regional political leanings, emphasizing the nuanced nature of American politics. Longitudinal comparisons track changes and trends in political preferences over time, providing context for shifts in voter sentiment and behavior. Examining voter data from different years helps identify long-term patterns, assess the impact of events or policy changes, and evaluate political strategies and messaging effectiveness.
 
 \newpage
 
@@ -423,7 +394,7 @@ Additionally, longitudinal comparisons allow us to track changes and trends in p
 # Appendix {-}
 
 
-# Additional data details
+
 
 # Model details {#sec-model-details}
 
@@ -431,7 +402,7 @@ Additionally, longitudinal comparisons allow us to track changes and trends in p
 
 In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. The results suggest that the data are essentially consistent with the model predictions, indicating that the model adequately captures the observed patterns and variability in the data.
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior.  
+In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior.  This involves comparing the initial distribution of parameters with the updated distribution in our logistic regression model. It's evident that the majority of the model parameters remain unchanged even after incorporating the data.
 
 ```{r width = 10, height = 6}
 #| eval: true
@@ -473,7 +444,8 @@ posterior_vs_prior(political_preferences) +
 
 ## Diagnostics
 
-@fig-stanareyouokay-1 is a trace plot. 
+@fig-stanareyouokay-1 is a trace plot. When the amplitude of the trace plot is small, it can indicate stability in the MCMC simulation.The majority of the data exhibit small amplitudes, suggesting that the model is relatively stable.
+@fig-stanareyouokay-2 represents the Rhat plot of the model, which compares the variability within each chain to the variability between chains in MCMC (Markov Chain Monte Carlo). Ideally, Rhat should be close to 1, indicating convergence of the chains to the same distribution. It's noticeable that all Rhat plots are close to 1, with none exceeding 1.05. This is promising as it suggests that the MCMC algorithm has successfully converged for our model.
 
 
 ```{r}
@@ -490,9 +462,21 @@ plot(political_preferences, "trace")
 
 plot(political_preferences, "rhat")
 ```
+## Credibility Interva
 
+```{r}
+#| echo: false
+#| eval: true
+#| label: fig-credibility
+#| fig-cap: "90 percent credibility interval"
+#| warning: false
 
+library(bayesplot)
+library(ggplot2)
 
+mcmc_intervals(political_preferences, prob = 0.9) 
+```
+@fig-credibility is 90 percent credibility interva.
 
 
 \newpage
